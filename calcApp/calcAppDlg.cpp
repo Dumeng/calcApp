@@ -83,6 +83,7 @@ BEGIN_MESSAGE_MAP(CcalcAppDlg, CDialogEx)
 	ON_BN_CLICKED(IDdivision, &CcalcAppDlg::OnBnClickeddivision)
 	ON_BN_CLICKED(IDbackspace, &CcalcAppDlg::OnBnClickedbackspace)
 	ON_BN_CLICKED(IDdot, &CcalcAppDlg::OnBnClickeddot)
+	ON_BN_CLICKED(IDce, &CcalcAppDlg::OnBnClickedce)
 END_MESSAGE_MAP()
 
 
@@ -361,4 +362,22 @@ void CcalcAppDlg::OnBnClickeddot()
 	pBox1->GetWindowText(CSstr);
 	CSstr += _T(".");
 	pBox1->SetWindowText(CSstr);
+}
+
+
+void CcalcAppDlg::OnBnClickedce()
+{
+	if (_gotArray2)
+	{
+		_array2 = 0;
+		_gotArray2 = false;
+		pBox1->SetWindowText(_T("0"));
+	}
+	else
+	{
+		_array1 = 0;
+		_operator = 0;
+		pBox1->SetWindowText(_T("0"));
+	}
+		
 }

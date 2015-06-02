@@ -55,4 +55,5 @@ public:
 	afx_msg void OnBnClickeddivision();
 	afx_msg void OnBnClickedbackspace();
 	afx_msg void OnBnClickeddot();
+	afx_msg void OnBnClickedce();
 };
