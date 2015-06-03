@@ -60,4 +60,13 @@ public:
 	afx_msg void OnBnClickedprecent();
 	afx_msg void OnBnClickedreciprocal();
 	afx_msg void OnBnClickeddms();
+	afx_msg void OnBnClickedcosh();
+	afx_msg void OnBnClickedcos();
+	afx_msg void OnBnClickedpower();
+	afx_msg void OnBnClickedextract();
+	afx_msg void OnBnClickedmc();
+	afx_msg void OnBnClickedmr();
+	afx_msg void OnBnClickedms();
+	afx_msg void OnBnClickedmplus();
+	afx_msg void OnBnClickedmminus();
 };

@@ -88,6 +88,15 @@ BEGIN_MESSAGE_MAP(CcalcAppDlg, CDialogEx)
 	ON_BN_CLICKED(IDprecent, &CcalcAppDlg::OnBnClickedprecent)
 	ON_BN_CLICKED(IDreciprocal, &CcalcAppDlg::OnBnClickedreciprocal)
 	ON_BN_CLICKED(IDdms, &CcalcAppDlg::OnBnClickeddms)
+	ON_BN_CLICKED(IDcosh, &CcalcAppDlg::OnBnClickedcosh)
+	ON_BN_CLICKED(IDcos, &CcalcAppDlg::OnBnClickedcos)
+	ON_BN_CLICKED(IDpower, &CcalcAppDlg::OnBnClickedpower)
+	ON_BN_CLICKED(IDextract, &CcalcAppDlg::OnBnClickedextract)
+	ON_BN_CLICKED(IDmc, &CcalcAppDlg::OnBnClickedmc)
+	ON_BN_CLICKED(IDmr, &CcalcAppDlg::OnBnClickedmr)
+	ON_BN_CLICKED(IDms, &CcalcAppDlg::OnBnClickedms)
+	ON_BN_CLICKED(IDmplus, &CcalcAppDlg::OnBnClickedmplus)
+	ON_BN_CLICKED(IDmminus, &CcalcAppDlg::OnBnClickedmminus)
 END_MESSAGE_MAP()
 
 
@@ -214,9 +223,23 @@ double calculate()
 		case 3:
 			return _array1 * _array2;
 		case 4:
+			if (_array2 == 0)
+			{
+				errno = ERANGE;
+				return 0;
+			}
 			return _array1 / _array2;
 		case 5:
 			return _array1 / _array2 * 100;
+		case 6:
+			return pow(_array1, _array2);
+		case 7:
+			if (_array2 == 0)
+			{
+				errno = ERANGE;
+				return 0;
+			}
+			return pow(_array1, 1 / _array2);
 	}
 	return 0;
 }
@@ -235,7 +258,7 @@ void keyPress(int num)
 	pBox1->GetWindowText(CSstr);
 	if (_operator != 0 && _gotArray2 == false)
 		_gotArray2 = true;
-	if (getArray() == 0)
+	if (getArray() == 0 && CSstr.Find(_T(".")) != -1)
 		CSstr = "%d";
 	else
 		CSstr += _T("%d");
@@ -248,8 +271,13 @@ void CcalcAppDlg::OnBnClickedequal()
 {
 	static CString CSstr;
 	pBox1->GetWindowText(CSstr);
-	_array2 = _ttol(CSstr);
+	_array2 = _tstof(CSstr);
 	_result = calculate();
+	if (!errno)
+	{
+		pBox1->SetWindowText(_T("数据出错！"));
+		return;
+	}
 	CSstr.Format(_T("%.8lf"), _result);
 	pBox1->SetWindowText(CSstr);
 	if (_gotArray2)
@@ -331,6 +359,7 @@ void CcalcAppDlg::OnBnClickedc()
 	_array1 = _array2 = 0;
 	_gotArray2 = false;
 	_operator = 0;
+	errno = NULL;
 	pBox1->SetWindowText(_T("0"));
 }
 
@@ -435,6 +464,12 @@ void CcalcAppDlg::OnBnClickedreciprocal()
 {
 	static CString CSstr;
 	_array1 = getArray();
+	if (_array1 == 0)
+	{
+		errno = ERANGE;
+		pBox1->SetWindowText(_T("数据出错！"));
+		return;
+	}
 	_result = 1 / _array1;
 	CSstr.Format(_T("%.8lf"), _result);
 	pBox1->SetWindowText(CSstr);
@@ -453,4 +488,82 @@ void CcalcAppDlg::OnBnClickeddms()
 	s %= 60;
 	CSstr.Format(_T("%d°%d′%d″"), d, m, s);
 	pBox1->SetWindowText(CSstr);
+}
+
+
+void CcalcAppDlg::OnBnClickedcosh()
+{
+	static CString CSstr;
+	_array1 = getArray();
+	//cosh函数需替换
+	_result = cosh(_array1);
+	CSstr.Format(_T("%.8lf"), _result);
+	pBox1->SetWindowText(CSstr);
+}
+
+
+void CcalcAppDlg::OnBnClickedcos()
+{
+	static CString CSstr;
+	_array1 = getArray();
+	//cos函数需替换
+	_result = cos(_array1);
+	CSstr.Format(_T("%.8lf"), _result);
+	pBox1->SetWindowText(CSstr);
+}
+
+
+void CcalcAppDlg::OnBnClickedpower()
+{
+	_gotArray2 = false;
+	_array1 = getArray();
+	_operator = 6;
+	pBox1->SetWindowText(_T("0"));
+}
+
+
+void CcalcAppDlg::OnBnClickedextract()
+{
+	_gotArray2 = false;
+	_array1 = getArray();
+	_operator = 7;
+	pBox1->SetWindowText(_T("0"));
+}
+
+
+void CcalcAppDlg::OnBnClickedmc()
+{
+	_memory = 0;
+}
+
+
+void CcalcAppDlg::OnBnClickedmr()
+{
+	static CString CSstr;
+	pBox1->GetWindowText(CSstr);
+	_memory = _tstof(CSstr);
+}
+
+
+void CcalcAppDlg::OnBnClickedms()
+{
+	static CString CSstr;
+	CSstr.Format(_T("%lf"), _memory);
+	pBox1->SetWindowText(CSstr);
+}
+
+
+void CcalcAppDlg::OnBnClickedmplus()
+{
+	static CString CSstr;
+	pBox1->GetWindowText(CSstr);
+	_memory += _tstof(CSstr);
+}
+
+
+void CcalcAppDlg::OnBnClickedmminus()
+{
+	static CString CSstr;
+	pBox1->GetWindowText(CSstr);
+	_memory -= _tstof(CSstr);
 }
