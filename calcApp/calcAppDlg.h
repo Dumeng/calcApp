@@ -56,4 +56,8 @@ public:
 	afx_msg void OnBnClickedbackspace();
 	afx_msg void OnBnClickeddot();
 	afx_msg void OnBnClickedce();
+	afx_msg void OnBnClickedevolution();
+	afx_msg void OnBnClickedprecent();
+	afx_msg void OnBnClickedreciprocal();
+	afx_msg void OnBnClickeddms();
 };

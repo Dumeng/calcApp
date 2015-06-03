@@ -84,6 +84,10 @@ BEGIN_MESSAGE_MAP(CcalcAppDlg, CDialogEx)
 	ON_BN_CLICKED(IDbackspace, &CcalcAppDlg::OnBnClickedbackspace)
 	ON_BN_CLICKED(IDdot, &CcalcAppDlg::OnBnClickeddot)
 	ON_BN_CLICKED(IDce, &CcalcAppDlg::OnBnClickedce)
+	ON_BN_CLICKED(IDevolution, &CcalcAppDlg::OnBnClickedevolution)
+	ON_BN_CLICKED(IDprecent, &CcalcAppDlg::OnBnClickedprecent)
+	ON_BN_CLICKED(IDreciprocal, &CcalcAppDlg::OnBnClickedreciprocal)
+	ON_BN_CLICKED(IDdms, &CcalcAppDlg::OnBnClickeddms)
 END_MESSAGE_MAP()
 
 
@@ -138,6 +142,7 @@ BOOL CcalcAppDlg::OnInitDialog()
 	m_Font.DeleteObject();
 
 	pBox1 = (CEdit*)GetDlgItem(IDC_EDIT1);
+	pBox1->SetWindowText(_T("0"));
 
 	// TODO:  在此添加额外的初始化代码
 
@@ -196,9 +201,13 @@ HCURSOR CcalcAppDlg::OnQueryDragIcon()
 
 double calculate()
 {
+	if (!_gotArray2)
+		_array2 = _array1;
 	switch (_operator)
 	{
-	case 1:
+		case 0:
+			return _array1;
+		case 1:
 			return _array1 + _array2;
 		case 2:
 			return _array1 - _array2;
@@ -207,7 +216,7 @@ double calculate()
 		case 4:
 			return _array1 / _array2;
 		case 5:
-			return 0;
+			return _array1 / _array2 * 100;
 	}
 	return 0;
 }
@@ -217,14 +226,19 @@ double getArray()
 {
 	static CString CSstr;
 	pBox1->GetWindowText(CSstr);
-	return _ttol(CSstr);
+	return _tstof(CSstr);
 }
 
 void keyPress(int num)
 {
 	static CString CSstr;
 	pBox1->GetWindowText(CSstr);
-	CSstr += _T("%d");
+	if (_operator != 0 && _gotArray2 == false)
+		_gotArray2 = true;
+	if (getArray() == 0)
+		CSstr = "%d";
+	else
+		CSstr += _T("%d");
 	CSstr.Format(CSstr, num);
 	pBox1->SetWindowText(CSstr);
 }
@@ -236,8 +250,18 @@ void CcalcAppDlg::OnBnClickedequal()
 	pBox1->GetWindowText(CSstr);
 	_array2 = _ttol(CSstr);
 	_result = calculate();
-	CSstr.Format(_T("%0.8lf"), _result);
+	CSstr.Format(_T("%.8lf"), _result);
 	pBox1->SetWindowText(CSstr);
+	if (_gotArray2)
+	{
+		_result = _array1 = _array2 = 0;
+		_operator = 0;
+		_gotArray2 = false;
+	}
+	else
+	{
+		_array2 = _result = 0;
+	}
 }
 
 
@@ -322,29 +346,37 @@ void CcalcAppDlg::OnBnClickedopposite()
 
 void CcalcAppDlg::OnBnClickedplus()
 {
+	_gotArray2 = false;
 	_array1 = getArray();
 	_operator = 1;
+	pBox1->SetWindowText(_T("0"));
 }
 
 
 void CcalcAppDlg::OnBnClickedminus()
 {
+	_gotArray2 = false;
 	_array1 = getArray();
 	_operator = 2;
+	pBox1->SetWindowText(_T("0"));
 }
 
 
 void CcalcAppDlg::OnBnClickedmulti()
 {
+	_gotArray2 = false;
 	_array1 = getArray();
 	_operator = 3;
+	pBox1->SetWindowText(_T("0"));
 }
 
 
 void CcalcAppDlg::OnBnClickeddivision()
 {
+	_gotArray2 = false;
 	_array1 = getArray();
 	_operator = 4;
+	pBox1->SetWindowText(_T("0"));
 }
 
 
@@ -379,5 +411,46 @@ void CcalcAppDlg::OnBnClickedce()
 		_operator = 0;
 		pBox1->SetWindowText(_T("0"));
 	}
-		
+}
+
+
+void CcalcAppDlg::OnBnClickedevolution()
+{
+	static CString CSstr;
+	_array1 = getArray();
+	_result = sqrt(_array1);
+	CSstr.Format(_T("%.8lf"), _result);
+	pBox1->SetWindowText(CSstr);
+}
+
+
+void CcalcAppDlg::OnBnClickedprecent()
+{
+	_array1 = getArray();
+	_operator = 5;
+}
+
+
+void CcalcAppDlg::OnBnClickedreciprocal()
+{
+	static CString CSstr;
+	_array1 = getArray();
+	_result = 1 / _array1;
+	CSstr.Format(_T("%.8lf"), _result);
+	pBox1->SetWindowText(CSstr);
+}
+
+
+void CcalcAppDlg::OnBnClickeddms()
+{
+	static CString CSstr; 
+	int d, m, s;
+	_array1 = getArray();
+	d = (int)floor(_array1);
+	m = (int)floor(_array1 * 60);
+	m %= 60;
+	s = (int)floor(_array1 * 3600);
+	s %= 60;
+	CSstr.Format(_T("%d°%d′%d″"), d, m, s);
+	pBox1->SetWindowText(CSstr);
 }
